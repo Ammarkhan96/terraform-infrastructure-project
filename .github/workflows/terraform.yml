@@ -1,0 +1,47 @@
+name: Terraform Infrastructure CI 
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Terraform Validation and Plan
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Start Kind Kubernetes Cluster
+        uses: helm/kind-action@v1
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Initialize Dev
+        run: terraform -chdir=envs/dev init -input=false
+
+      - name: Validate Dev
+        run: terraform -chdir=envs/dev validate
+
+      - name: Dev Infrastructure Plan
+        run: terraform -chdir=envs/dev plan -input=false
+
+      - name: Initialize Prod
+        run: terraform -chdir=envs/prod init -input=false
+
+      - name: Validate Prod
+        run: terraform -chdir=envs/prod validate
+
+      - name: Prod Infrastructure Plan
+        run: terraform -chdir=envs/prod plan -input=false 
