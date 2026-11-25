@@ -15,6 +15,6 @@ variable "host_port" {
 }
 
 variable "network_name" {
-  description = "Docker network name"
+  description = "Docker network names"
   type        = string
 }
